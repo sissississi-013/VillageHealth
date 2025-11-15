@@ -270,6 +270,49 @@ app.post('/api/intake', async (req, res) => {
 });
 
 /**
+ * Process patient intake with structured data (Form-based, no AI extraction)
+ */
+app.post('/api/intake-direct', async (req, res) => {
+  try {
+    const { patientData } = req.body;
+
+    if (!patientData) {
+      return res.status(400).json({ error: 'Patient data is required' });
+    }
+
+    console.log('Processing structured patient data...');
+
+    // Step 1: Run clinical decision engine directly (skip AI extraction)
+    const diagnosis = diagnosePatient(patientData);
+
+    // Step 2: Generate simple confirmation summary
+    const confirmationSummary = `Assessment complete for ${patientData.name}, ${patientData.age}. ${diagnosis.diagnoses[0]?.classification || 'Assessment completed'}.`;
+
+    // Step 3: Save patient encounter
+    const patientRecord = {
+      id: nextPatientId++,
+      ...diagnosis,
+      confirmationSummary: confirmationSummary
+    };
+    patients.push(patientRecord);
+
+    res.json({
+      success: true,
+      patientId: patientRecord.id,
+      diagnosis: diagnosis,
+      confirmationSummary: confirmationSummary
+    });
+
+  } catch (error) {
+    console.error('Error processing intake:', error);
+    res.status(500).json({
+      error: 'Failed to process patient intake',
+      details: error.message
+    });
+  }
+});
+
+/**
  * Get all patient records
  */
 app.get('/api/patients', (req, res) => {

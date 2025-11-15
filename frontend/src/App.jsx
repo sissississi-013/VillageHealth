@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import './App.css';
+import FormIntake from './components/FormIntake';
 import ChatInterface from './components/ChatInterface';
 import PatientDashboard from './components/PatientDashboard';
 import PatientDetail from './components/PatientDetail';
@@ -19,13 +20,19 @@ function Navigation() {
             to="/"
             className={location.pathname === '/' ? 'nav-link active' : 'nav-link'}
           >
-            Patient Intake
+            📝 Form Intake
+          </Link>
+          <Link
+            to="/chat"
+            className={location.pathname === '/chat' ? 'nav-link active' : 'nav-link'}
+          >
+            💬 Chat Intake
           </Link>
           <Link
             to="/patients"
             className={location.pathname === '/patients' ? 'nav-link active' : 'nav-link'}
           >
-            Patient Records
+            📋 Patient Records
           </Link>
         </div>
       </div>
@@ -40,7 +47,8 @@ function App() {
         <Navigation />
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<ChatInterface />} />
+            <Route path="/" element={<FormIntake />} />
+            <Route path="/chat" element={<ChatInterface />} />
             <Route path="/patients" element={<PatientDashboard />} />
             <Route path="/patients/:id" element={<PatientDetail />} />
           </Routes>
