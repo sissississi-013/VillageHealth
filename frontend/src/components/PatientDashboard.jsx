@@ -10,6 +10,7 @@ function PatientDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [completedTasks, setCompletedTasks] = useState(new Set());
+  const [confirmedTasks, setConfirmedTasks] = useState(new Set());
 
   useEffect(() => {
     fetchPatients();
@@ -135,7 +136,36 @@ function PatientDashboard() {
     });
   };
 
-  const tasks = generateTasks();
+  const confirmTask = async (task) => {
+    try {
+      // Call backend to mark task as complete in patient record
+      await axios.post(`${API_URL}/patients/${task.patientId}/complete-task`, {
+        task: {
+          id: task.id,
+          task: task.task,
+          type: task.type,
+          priority: task.priority,
+          completedAt: new Date().toISOString()
+        }
+      });
+
+      // Mark task as confirmed locally
+      setConfirmedTasks(prev => new Set([...prev, task.id]));
+      setCompletedTasks(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(task.id);
+        return newSet;
+      });
+
+      // Refresh patient list to reflect changes
+      await fetchPatients();
+    } catch (err) {
+      console.error('Error confirming task:', err);
+      alert('Failed to confirm task. Please try again.');
+    }
+  };
+
+  const tasks = generateTasks().filter(task => !confirmedTasks.has(task.id));
 
   if (loading) {
     return (
@@ -236,27 +266,36 @@ function PatientDashboard() {
             </div>
             <div className="tasks-list">
               {tasks.map((task) => (
-                <div
-                  key={task.id}
-                  className={`task-item ${task.priority} ${completedTasks.has(task.id) ? 'completed' : ''}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={completedTasks.has(task.id)}
-                    onChange={() => toggleTask(task.id)}
-                    className="task-checkbox"
-                  />
-                  <div className="task-content">
-                    <div className="task-text">{task.task}</div>
-                    <Link to={`/patients/${task.patientId}`} className="task-patient-link">
-                      View patient →
-                    </Link>
+                <div key={task.id}>
+                  <div
+                    className={`task-item ${task.priority} ${completedTasks.has(task.id) ? 'completed' : ''}`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={completedTasks.has(task.id)}
+                      onChange={() => toggleTask(task.id)}
+                      className="task-checkbox"
+                    />
+                    <div className="task-content">
+                      <div className="task-text">{task.task}</div>
+                      <Link to={`/patients/${task.patientId}`} className="task-patient-link">
+                        View patient →
+                      </Link>
+                    </div>
+                    <div className={`task-priority-indicator ${task.priority}`}>
+                      {task.priority === 'critical' && '🚨'}
+                      {task.priority === 'high' && '⚠️'}
+                      {task.priority === 'normal' && '📋'}
+                    </div>
                   </div>
-                  <div className={`task-priority-indicator ${task.priority}`}>
-                    {task.priority === 'critical' && '🚨'}
-                    {task.priority === 'high' && '⚠️'}
-                    {task.priority === 'normal' && '📋'}
-                  </div>
+                  {completedTasks.has(task.id) && (
+                    <button
+                      onClick={() => confirmTask(task)}
+                      className="confirm-task-button"
+                    >
+                      ✓ Confirm Completion
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

@@ -455,6 +455,60 @@
   background: #0056b3;
 }
 
+.history-description {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.completed-task-card {
+  background: #f8f9fa;
+  border-left: 4px solid #28a745;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.completed-task-card:last-child {
+  margin-bottom: 0;
+}
+
+.completed-task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.completed-task-text {
+  font-size: 0.95rem;
+  color: #333;
+  flex: 1;
+}
+
+.completed-badge {
+  padding: 0.25rem 0.75rem;
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 1rem;
+}
+
+.completed-task-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.completed-date {
+  font-size: 0.85rem;
+  color: #28a745;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .detail-header {
     flex-direction: column;
@@ -480,6 +534,16 @@
 
   .export-modal-actions {
     flex-direction: column;
+  }
+
+  .completed-task-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .completed-badge {
+    margin-left: 0;
   }
 }
 

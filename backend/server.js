@@ -156,7 +156,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
 
   try {
     const message = await anthropic.messages.create({
-      model: 'claude-3-opus-20240229',
+      model: 'claude-3-sonnet-20240229',
       max_tokens: 2000,
       messages: [{
         role: 'user',
@@ -196,7 +196,7 @@ Make it reassuring and actionable. Example: "Let me confirm: This is Amara, 18 m
 
   try {
     const message = await anthropic.messages.create({
-      model: 'claude-3-opus-20240229',
+      model: 'claude-3-sonnet-20240229',
       max_tokens: 300,
       messages: [{
         role: 'user',
@@ -398,6 +398,52 @@ app.put('/api/patients/:id', async (req, res) => {
 });
 
 /**
+ * Mark task as completed and move to patient history
+ */
+app.post('/api/patients/:id/complete-task', (req, res) => {
+  try {
+    const patientId = parseInt(req.params.id);
+    const { task } = req.body;
+
+    if (!task) {
+      return res.status(400).json({ error: 'Task data is required' });
+    }
+
+    const patientIndex = patients.findIndex(p => p.id === patientId);
+
+    if (patientIndex === -1) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    console.log(`Marking task complete for patient ${patientId}:`, task.task);
+
+    // Initialize completedTasks array if it doesn't exist
+    if (!patients[patientIndex].completedTasks) {
+      patients[patientIndex].completedTasks = [];
+    }
+
+    // Add task to completed tasks history
+    patients[patientIndex].completedTasks.push({
+      ...task,
+      completedAt: task.completedAt || new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      message: 'Task marked as complete',
+      patientId: patientId
+    });
+
+  } catch (error) {
+    console.error('Error completing task:', error);
+    res.status(500).json({
+      error: 'Failed to complete task',
+      details: error.message
+    });
+  }
+});
+
+/**
  * Export patient record for referral
  */
 app.get('/api/patients/:id/export', (req, res) => {
@@ -474,7 +520,7 @@ Your role is to:
 Be concise, clear, and clinically accurate. Use simple language appropriate for CHWs. Always emphasize patient safety and proper referral when needed.`;
 
     const chatMessage = await anthropic.messages.create({
-      model: 'claude-3-opus-20240229',
+      model: 'claude-3-haiku-20240307',
       max_tokens: 500,
       system: systemPrompt,
       messages: [{

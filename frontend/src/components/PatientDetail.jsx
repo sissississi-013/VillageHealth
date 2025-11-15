@@ -247,6 +247,32 @@ function PatientDetail() {
           </div>
         )}
 
+        {patient.completedTasks && patient.completedTasks.length > 0 && (
+          <div className="detail-section">
+            <h2>✅ Completed Tasks History</h2>
+            <p className="history-description">Tasks that have been completed and resolved</p>
+            {patient.completedTasks.map((completedTask, index) => (
+              <div key={index} className="completed-task-card">
+                <div className="completed-task-header">
+                  <span className="completed-task-text">{completedTask.task}</span>
+                  <span className="completed-badge">{completedTask.priority.toUpperCase()}</span>
+                </div>
+                <div className="completed-task-footer">
+                  <span className="completed-date">
+                    ✓ Completed on {new Date(completedTask.completedAt).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {patient.confirmationSummary && (
           <div className="detail-section">
             <h2>Assessment Summary</h2>
