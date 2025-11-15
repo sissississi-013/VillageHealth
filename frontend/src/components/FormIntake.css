@@ -483,6 +483,248 @@ input[type="checkbox"] {
 }
 
 /* Responsive */
+/* Enhanced Features */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.template-button,
+.clear-button {
+  padding: 0.5rem 1rem;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.template-button:hover {
+  border-color: #007bff;
+  background: #f0f8ff;
+}
+
+.clear-button:hover {
+  border-color: #dc3545;
+  background: #fff5f5;
+  color: #dc3545;
+}
+
+/* Templates Modal */
+.templates-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.templates-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.templates-content h3 {
+  margin-top: 0;
+  color: #1a1a1a;
+}
+
+.templates-hint {
+  color: #666;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.template-card {
+  padding: 1.5rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  text-align: center;
+}
+
+.template-card:hover {
+  border-color: #007bff;
+  background: #f0f8ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.close-templates {
+  width: 100%;
+  padding: 0.75rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.close-templates:hover {
+  background: #5a6268;
+}
+
+/* Progress Info */
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.time-elapsed {
+  font-size: 0.9rem;
+  color: #007bff;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+/* Keyboard Hints */
+.keyboard-hints {
+  text-align: center;
+  padding: 0.75rem;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: #856404;
+}
+
+/* Assessment Summary Card */
+.assessment-summary-card {
+  background: #f8f9fa;
+  border: 2px solid #007bff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.summary-header h4 {
+  margin: 0;
+  color: #1a1a1a;
+}
+
+.summary-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat {
+  padding: 0.5rem 1rem;
+  background: white;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  border: 1px solid #e0e0e0;
+}
+
+.stat.danger {
+  background: #ffebee;
+  color: #c62828;
+  border-color: #ef5350;
+}
+
+/* MUAC Indicator */
+.muac-indicator {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.muac-indicator.red {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.muac-indicator.yellow {
+  background: #fffde7;
+  color: #f57f17;
+}
+
+.muac-indicator.green {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* Danger Warning */
+.danger-warning {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border: 2px solid #ff9800;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 600;
+  color: #e65100;
+}
+
+/* Submit Confirmation */
+.submit-confirmation {
+  text-align: center;
+  padding: 1.5rem;
+  background: #e8f5e9;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.submit-confirmation p {
+  margin: 0.5rem 0;
+  color: #2e7d32;
+}
+
+.time-info {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Skip Hint */
+.skip-hint {
+  font-size: 0.8rem;
+  color: #ffc107;
+  margin-left: 0.5rem;
+}
+
+/* Enhanced Option Buttons */
+.option-button span {
+  margin-right: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .form-card {
     padding: 1.5rem;
@@ -510,5 +752,23 @@ input[type="checkbox"] {
 
   .form-navigation {
     flex-direction: column;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .templates-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-stats {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .stat {
+    width: 100%;
+    text-align: center;
   }
 }

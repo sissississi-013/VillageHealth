@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import './App.css';
-import FormIntake from './components/FormIntake';
+import FormIntakeEnhanced from './components/FormIntakeEnhanced';
 import ChatInterface from './components/ChatInterface';
 import PatientDashboard from './components/PatientDashboard';
 import PatientDetail from './components/PatientDetail';
@@ -47,7 +47,7 @@ function App() {
         <Navigation />
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<FormIntake />} />
+            <Route path="/" element={<FormIntakeEnhanced />} />
             <Route path="/chat" element={<ChatInterface />} />
             <Route path="/patients" element={<PatientDashboard />} />
             <Route path="/patients/:id" element={<PatientDetail />} />
