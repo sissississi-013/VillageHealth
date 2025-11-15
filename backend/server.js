@@ -392,6 +392,52 @@ Community Health Worker: [CHW Name]
 });
 
 /**
+ * Chatbot endpoint for WHO IMCI assistant
+ */
+app.post('/api/chatbot', async (req, res) => {
+  try {
+    const { message, context } = req.body;
+
+    if (!message || message.trim().length === 0) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    const systemPrompt = `You are a helpful WHO IMCI (Integrated Management of Childhood Illness) clinical assistant helping Community Health Workers (CHWs) and nurses.
+
+Your role is to:
+- Answer questions about the IMCI assessment form and clinical guidelines
+- Clarify danger signs, symptoms, and treatment protocols
+- Provide quick reference information about WHO IMCI standards
+- Help interpret clinical findings
+- Offer guidance on when to refer patients
+
+Be concise, clear, and clinically accurate. Use simple language appropriate for CHWs. Always emphasize patient safety and proper referral when needed.`;
+
+    const chatMessage = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 500,
+      system: systemPrompt,
+      messages: [{
+        role: 'user',
+        content: message
+      }]
+    });
+
+    res.json({
+      success: true,
+      response: chatMessage.content[0].text
+    });
+
+  } catch (error) {
+    console.error('Chatbot error:', error);
+    res.status(500).json({
+      error: 'Failed to process chatbot message',
+      details: error.message
+    });
+  }
+});
+
+/**
  * Delete patient record (for demo purposes)
  */
 app.delete('/api/patients/:id', (req, res) => {

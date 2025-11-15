@@ -4,6 +4,7 @@ import FormIntakeEnhanced from './components/FormIntakeEnhanced';
 import ChatInterface from './components/ChatInterface';
 import PatientDashboard from './components/PatientDashboard';
 import PatientDetail from './components/PatientDetail';
+import ChatbotOverlay from './components/ChatbotOverlay';
 
 function Navigation() {
   const location = useLocation();
@@ -53,6 +54,7 @@ function App() {
             <Route path="/patients/:id" element={<PatientDetail />} />
           </Routes>
         </main>
+        <ChatbotOverlay />
       </div>
     </Router>
   );

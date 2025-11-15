@@ -455,11 +455,6 @@ function FormIntakeEnhanced() {
           </div>
         )}
 
-        {/* Rest of the steps remain the same, but I'll add the final review step improvements */}
-
-        {/* Steps 2-7 are identical to the original FormIntake.jsx */}
-        {/* For brevity, I'll show just step 2 and step 8 with improvements */}
-
         {/* Step 2: Chief Complaint */}
         {step === 2 && (
           <div className="form-step">
@@ -478,6 +473,484 @@ function FormIntakeEnhanced() {
                   {complaint}
                 </button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Danger Signs */}
+        {step === 3 && (
+          <div className="form-step">
+            <h3>Step 3: Danger Signs Check</h3>
+            <p className="step-description danger-text">⚠️ Check for ANY signs that require immediate referral</p>
+
+            <div className="danger-signs-grid">
+              <div className="danger-sign-item">
+                <input
+                  type="checkbox"
+                  id="convulsions"
+                  checked={formData.convulsions}
+                  onChange={() => handleCheckboxToggle('convulsions')}
+                />
+                <label htmlFor="convulsions">
+                  <strong>Convulsions</strong>
+                  <span className="hint">History of seizures or fits</span>
+                </label>
+              </div>
+
+              <div className="danger-sign-item">
+                <input
+                  type="checkbox"
+                  id="unconscious"
+                  checked={formData.unconscious}
+                  onChange={() => handleCheckboxToggle('unconscious')}
+                />
+                <label htmlFor="unconscious">
+                  <strong>Unconscious</strong>
+                  <span className="hint">Not responding to voice or touch</span>
+                </label>
+              </div>
+
+              <div className="danger-sign-item">
+                <input
+                  type="checkbox"
+                  id="lethargic"
+                  checked={formData.lethargic}
+                  onChange={() => handleCheckboxToggle('lethargic')}
+                />
+                <label htmlFor="lethargic">
+                  <strong>Lethargic or Floppy</strong>
+                  <span className="hint">Very weak, not moving normally</span>
+                </label>
+              </div>
+
+              <div className="danger-sign-item">
+                <input
+                  type="checkbox"
+                  id="cannotDrink"
+                  checked={formData.cannotDrink}
+                  onChange={() => handleCheckboxToggle('cannotDrink')}
+                />
+                <label htmlFor="cannotDrink">
+                  <strong>Cannot Drink or Breastfeed</strong>
+                  <span className="hint">Unable to take any fluids</span>
+                </label>
+              </div>
+
+              <div className="danger-sign-item">
+                <input
+                  type="checkbox"
+                  id="vomitsEverything"
+                  checked={formData.vomitsEverything}
+                  onChange={() => handleCheckboxToggle('vomitsEverything')}
+                />
+                <label htmlFor="vomitsEverything">
+                  <strong>Vomits Everything</strong>
+                  <span className="hint">Cannot keep anything down</span>
+                </label>
+              </div>
+
+              <div className="danger-sign-item">
+                <input
+                  type="checkbox"
+                  id="chestIndrawing"
+                  checked={formData.chestIndrawing}
+                  onChange={() => handleCheckboxToggle('chestIndrawing')}
+                />
+                <label htmlFor="chestIndrawing">
+                  <strong>Chest Indrawing</strong>
+                  <span className="hint">Lower chest wall pulls in with breathing</span>
+                </label>
+              </div>
+            </div>
+
+            {hasDangerSigns() && (
+              <div className="danger-alert">
+                <strong>⚠️ DANGER SIGNS DETECTED</strong>
+                <p>This patient will require urgent referral to a health facility.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Step 4: Respiratory Assessment */}
+        {step === 4 && (
+          <div className="form-step">
+            <h3>Step 4: Respiratory Assessment</h3>
+            <p className="step-description">Check for cough or difficulty breathing</p>
+
+            <div className="form-group">
+              <label>Does the child have a cough or difficult breathing? *</label>
+              <div className="button-group">
+                <button
+                  type="button"
+                  className={`option-button ${formData.hasCough === 'yes' ? 'selected' : ''}`}
+                  onClick={() => handleChange('hasCough', 'yes')}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  className={`option-button ${formData.hasCough === 'no' ? 'selected' : ''}`}
+                  onClick={() => handleChange('hasCough', 'no')}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+
+            {formData.hasCough === 'yes' && (
+              <>
+                <div className="form-group">
+                  <label>For how many days?</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="90"
+                    value={formData.coughDuration}
+                    onChange={(e) => handleChange('coughDuration', e.target.value)}
+                    placeholder="Number of days"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Respiratory Rate (breaths per minute)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="120"
+                    value={formData.respiratoryRate}
+                    onChange={(e) => handleChange('respiratoryRate', e.target.value)}
+                    placeholder="Count for 1 full minute"
+                    className="form-input"
+                  />
+                  <div className="hint-box">
+                    <strong>Normal ranges:</strong> &lt;2 months: &lt;60, 2-11 months: &lt;50, 12+ months: &lt;40
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <input
+                    type="checkbox"
+                    id="stridorWhenCalm"
+                    checked={formData.stridorWhenCalm}
+                    onChange={() => handleCheckboxToggle('stridorWhenCalm')}
+                  />
+                  <label htmlFor="stridorWhenCalm">
+                    Stridor when calm (harsh noise when breathing in)
+                  </label>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Step 5: Diarrhea Assessment */}
+        {step === 5 && (
+          <div className="form-step">
+            <h3>Step 5: Diarrhea Assessment</h3>
+            <p className="step-description">Check for diarrhea and dehydration</p>
+
+            <div className="form-group">
+              <label>Does the child have diarrhea? *</label>
+              <div className="button-group">
+                <button
+                  type="button"
+                  className={`option-button ${formData.hasDiarrhea === 'yes' ? 'selected' : ''}`}
+                  onClick={() => handleChange('hasDiarrhea', 'yes')}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  className={`option-button ${formData.hasDiarrhea === 'no' ? 'selected' : ''}`}
+                  onClick={() => handleChange('hasDiarrhea', 'no')}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+
+            {formData.hasDiarrhea === 'yes' && (
+              <>
+                <div className="form-group">
+                  <label>For how many days?</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="90"
+                    value={formData.diarrheaDuration}
+                    onChange={(e) => handleChange('diarrheaDuration', e.target.value)}
+                    placeholder="Number of days"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <input
+                    type="checkbox"
+                    id="bloodInStool"
+                    checked={formData.bloodInStool}
+                    onChange={() => handleCheckboxToggle('bloodInStool')}
+                  />
+                  <label htmlFor="bloodInStool">
+                    <strong>Blood in stool</strong> (visible blood in diarrhea)
+                  </label>
+                </div>
+
+                <div className="dehydration-section">
+                  <h4>Dehydration Signs:</h4>
+
+                  <div className="form-group">
+                    <input
+                      type="checkbox"
+                      id="sunkenEyes"
+                      checked={formData.sunkenEyes}
+                      onChange={() => handleCheckboxToggle('sunkenEyes')}
+                    />
+                    <label htmlFor="sunkenEyes">Sunken eyes</label>
+                  </div>
+
+                  <div className="form-group">
+                    <input
+                      type="checkbox"
+                      id="drinksEagerly"
+                      checked={formData.drinksEagerly}
+                      onChange={() => handleCheckboxToggle('drinksEagerly')}
+                    />
+                    <label htmlFor="drinksEagerly">Drinks eagerly or thirsty</label>
+                  </div>
+
+                  <div className="form-group">
+                    <input
+                      type="checkbox"
+                      id="restless"
+                      checked={formData.restless}
+                      onChange={() => handleCheckboxToggle('restless')}
+                    />
+                    <label htmlFor="restless">Restless or irritable</label>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Skin pinch (pinch skin of abdomen)</label>
+                    <div className="button-group">
+                      <button
+                        type="button"
+                        className={`option-button small ${formData.skinPinch === 'normal' ? 'selected' : ''}`}
+                        onClick={() => handleChange('skinPinch', 'normal')}
+                      >
+                        Goes back quickly
+                      </button>
+                      <button
+                        type="button"
+                        className={`option-button small ${formData.skinPinch === 'slow' ? 'selected' : ''}`}
+                        onClick={() => handleChange('skinPinch', 'slow')}
+                      >
+                        Goes back slowly
+                      </button>
+                      <button
+                        type="button"
+                        className={`option-button small ${formData.skinPinch === 'very slow' ? 'selected' : ''}`}
+                        onClick={() => handleChange('skinPinch', 'very slow')}
+                      >
+                        Goes back very slowly
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Step 6: Fever Assessment */}
+        {step === 6 && (
+          <div className="form-step">
+            <h3>Step 6: Fever Assessment</h3>
+            <p className="step-description">Check for fever and related conditions</p>
+
+            <div className="form-group">
+              <label>Does the child have fever? *</label>
+              <div className="button-group">
+                <button
+                  type="button"
+                  className={`option-button ${formData.hasFever === 'yes' ? 'selected' : ''}`}
+                  onClick={() => handleChange('hasFever', 'yes')}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  className={`option-button ${formData.hasFever === 'no' ? 'selected' : ''}`}
+                  onClick={() => handleChange('hasFever', 'no')}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+
+            {formData.hasFever === 'yes' && (
+              <>
+                <div className="form-group">
+                  <label>For how many days?</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="90"
+                    value={formData.feverDuration}
+                    onChange={(e) => handleChange('feverDuration', e.target.value)}
+                    placeholder="Number of days"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Temperature (°C) - Optional</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="35"
+                    max="43"
+                    value={formData.temperature}
+                    onChange={(e) => handleChange('temperature', e.target.value)}
+                    placeholder="e.g., 38.5"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <input
+                    type="checkbox"
+                    id="hasStiffNeck"
+                    checked={formData.hasStiffNeck}
+                    onChange={() => handleCheckboxToggle('hasStiffNeck')}
+                  />
+                  <label htmlFor="hasStiffNeck">
+                    <strong>Stiff neck</strong> (cannot touch chin to chest)
+                  </label>
+                </div>
+
+                <div className="form-group">
+                  <input
+                    type="checkbox"
+                    id="hasBulgingFontanelle"
+                    checked={formData.hasBulgingFontanelle}
+                    onChange={() => handleCheckboxToggle('hasBulgingFontanelle')}
+                  />
+                  <label htmlFor="hasBulgingFontanelle">
+                    <strong>Bulging fontanelle</strong> (soft spot on head is bulging)
+                  </label>
+                </div>
+
+                <div className="form-group">
+                  <label>Is this area at risk for malaria?</label>
+                  <div className="button-group">
+                    <button
+                      type="button"
+                      className={`option-button ${formData.malariaRiskArea === true ? 'selected' : ''}`}
+                      onClick={() => handleChange('malariaRiskArea', true)}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      type="button"
+                      className={`option-button ${formData.malariaRiskArea === false ? 'selected' : ''}`}
+                      onClick={() => handleChange('malariaRiskArea', false)}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+
+                {formData.malariaRiskArea && (
+                  <div className="form-group">
+                    <label>Malaria rapid test result</label>
+                    <div className="button-group">
+                      <button
+                        type="button"
+                        className={`option-button ${formData.malariaTestPositive === 'yes' ? 'selected' : ''}`}
+                        onClick={() => handleChange('malariaTestPositive', 'yes')}
+                      >
+                        Positive
+                      </button>
+                      <button
+                        type="button"
+                        className={`option-button ${formData.malariaTestPositive === 'no' ? 'selected' : ''}`}
+                        onClick={() => handleChange('malariaTestPositive', 'no')}
+                      >
+                        Negative
+                      </button>
+                      <button
+                        type="button"
+                        className={`option-button ${formData.malariaTestPositive === 'not tested' ? 'selected' : ''}`}
+                        onClick={() => handleChange('malariaTestPositive', 'not tested')}
+                      >
+                        Not Tested
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Step 7: Nutrition Assessment */}
+        {step === 7 && (
+          <div className="form-step">
+            <h3>Step 7: Nutrition Assessment</h3>
+            <p className="step-description">Check nutritional status</p>
+
+            <div className="form-group">
+              <label>MUAC (Mid-Upper Arm Circumference) measurement</label>
+              <div className="muac-buttons">
+                <button
+                  type="button"
+                  className={`muac-button red ${formData.muac === 'red' ? 'selected' : ''}`}
+                  onClick={() => handleChange('muac', 'red')}
+                >
+                  <span className="muac-color red-band"></span>
+                  Red (&lt;115mm)
+                  <span className="muac-label">Severe</span>
+                </button>
+                <button
+                  type="button"
+                  className={`muac-button yellow ${formData.muac === 'yellow' ? 'selected' : ''}`}
+                  onClick={() => handleChange('muac', 'yellow')}
+                >
+                  <span className="muac-color yellow-band"></span>
+                  Yellow (115-125mm)
+                  <span className="muac-label">Moderate</span>
+                </button>
+                <button
+                  type="button"
+                  className={`muac-button green ${formData.muac === 'green' ? 'selected' : ''}`}
+                  onClick={() => handleChange('muac', 'green')}
+                >
+                  <span className="muac-color green-band"></span>
+                  Green (&gt;125mm)
+                  <span className="muac-label">Normal</span>
+                </button>
+                <button
+                  type="button"
+                  className={`muac-button ${formData.muac === 'not measured' ? 'selected' : ''}`}
+                  onClick={() => handleChange('muac', 'not measured')}
+                >
+                  Not Measured
+                </button>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <input
+                type="checkbox"
+                id="bilateralFootEdema"
+                checked={formData.bilateralFootEdema}
+                onChange={() => handleCheckboxToggle('bilateralFootEdema')}
+              />
+              <label htmlFor="bilateralFootEdema">
+                <strong>Bilateral foot edema</strong> (swelling of both feet)
+              </label>
             </div>
           </div>
         )}
