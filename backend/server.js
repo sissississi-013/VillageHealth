@@ -156,7 +156,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
 
   try {
     const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-opus-20240229',
       max_tokens: 2000,
       messages: [{
         role: 'user',
@@ -196,7 +196,7 @@ Make it reassuring and actionable. Example: "Let me confirm: This is Amara, 18 m
 
   try {
     const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-opus-20240229',
       max_tokens: 300,
       messages: [{
         role: 'user',
@@ -338,6 +338,66 @@ app.get('/api/patients/:id', (req, res) => {
 });
 
 /**
+ * Update patient record (for follow-up assessments)
+ */
+app.put('/api/patients/:id', async (req, res) => {
+  try {
+    const patientId = parseInt(req.params.id);
+    const { patientData } = req.body;
+
+    if (!patientData) {
+      return res.status(400).json({ error: 'Patient data is required' });
+    }
+
+    const patientIndex = patients.findIndex(p => p.id === patientId);
+
+    if (patientIndex === -1) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    console.log(`Updating patient record ${patientId}...`);
+
+    // Run clinical decision engine with new assessment data
+    const diagnosis = diagnosePatient(patientData);
+
+    // Generate new confirmation summary
+    const confirmationSummary = `Follow-up assessment complete for ${patientData.name}, ${patientData.age}. ${diagnosis.diagnoses[0]?.classification || 'Assessment completed'}.`;
+
+    // Check if new assessment has urgent conditions that override previous assessment
+    const hasNewUrgentCondition = diagnosis.urgentReferral;
+    const previouslyUrgent = patients[patientIndex].urgentReferral;
+
+    // Update the patient record, preserving the original ID and timestamp of first visit
+    const originalTimestamp = patients[patientIndex].timestamp;
+    const updatedRecord = {
+      id: patientId,
+      ...diagnosis,
+      confirmationSummary: confirmationSummary,
+      timestamp: originalTimestamp, // Keep original timestamp
+      lastUpdated: new Date().toISOString(), // Add last updated timestamp
+      isFollowUp: true
+    };
+
+    patients[patientIndex] = updatedRecord;
+
+    res.json({
+      success: true,
+      patientId: patientId,
+      diagnosis: diagnosis,
+      confirmationSummary: confirmationSummary,
+      wasUpdatedToUrgent: hasNewUrgentCondition && !previouslyUrgent
+    });
+
+  } catch (error) {
+    console.error('Error updating patient:', error);
+    res.status(500).json({
+      error: 'Failed to update patient record',
+      details: error.message
+    });
+  }
+});
+
+/**
  * Export patient record for referral
  */
 app.get('/api/patients/:id/export', (req, res) => {
@@ -414,7 +474,7 @@ Your role is to:
 Be concise, clear, and clinically accurate. Use simple language appropriate for CHWs. Always emphasize patient safety and proper referral when needed.`;
 
     const chatMessage = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-opus-20240229',
       max_tokens: 500,
       system: systemPrompt,
       messages: [{

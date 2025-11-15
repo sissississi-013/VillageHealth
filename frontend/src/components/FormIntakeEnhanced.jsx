@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './FormIntake.css';
 
@@ -61,11 +61,14 @@ const TEMPLATES = {
 
 function FormIntakeEnhanced() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [startTime] = useState(Date.now());
   const [showTemplates, setShowTemplates] = useState(false);
+  const [isFollowUp, setIsFollowUp] = useState(false);
+  const [originalPatientId, setOriginalPatientId] = useState(null);
 
   // Form data state
   const [formData, setFormData] = useState({
@@ -123,6 +126,69 @@ function FormIntakeEnhanced() {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [step, formData]);
+
+  // Detect follow-up patient and pre-fill form
+  useEffect(() => {
+    if (location.state?.followUpPatient) {
+      const patient = location.state.followUpPatient;
+      setIsFollowUp(true);
+      setOriginalPatientId(patient.id);
+
+      // Parse age from display format
+      const ageStr = patient.patientInfo?.age || patient.age;
+      let ageYears = '';
+      let ageMonths = '';
+
+      if (ageStr) {
+        const yearMatch = ageStr.match(/(\d+)\s*year/);
+        const monthMatch = ageStr.match(/(\d+)\s*month/);
+        if (yearMatch) ageYears = yearMatch[1];
+        if (monthMatch) ageMonths = monthMatch[1];
+      }
+
+      // Parse chief complaint back to array
+      const chiefComplaintArray = patient.chiefComplaint
+        ? patient.chiefComplaint.split(',').map(s => s.trim())
+        : [];
+
+      // Pre-fill form with patient data
+      setFormData({
+        name: patient.patientInfo?.name || patient.name || '',
+        ageYears: ageYears,
+        ageMonths: ageMonths,
+        sex: patient.patientInfo?.sex || patient.sex || '',
+        weight: patient.patientInfo?.weight || patient.weight || '',
+        chiefComplaint: chiefComplaintArray,
+        convulsions: false,
+        unconscious: false,
+        lethargic: false,
+        cannotDrink: false,
+        cannotEat: false,
+        vomitsEverything: false,
+        chestIndrawing: false,
+        hasCough: '',
+        coughDuration: '',
+        respiratoryRate: '',
+        stridorWhenCalm: false,
+        hasDiarrhea: '',
+        diarrheaDuration: '',
+        bloodInStool: false,
+        sunkenEyes: false,
+        drinksEagerly: false,
+        restless: false,
+        skinPinch: '',
+        hasFever: '',
+        feverDuration: '',
+        temperature: '',
+        hasStiffNeck: false,
+        hasBulgingFontanelle: false,
+        malariaRiskArea: true,
+        malariaTestPositive: '',
+        muac: patient.patientInfo?.muac || '',
+        bilateralFootEdema: false
+      });
+    }
+  }, [location.state]);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -293,15 +359,27 @@ function FormIntakeEnhanced() {
         bilateralFootEdema: formData.bilateralFootEdema
       };
 
-      const response = await axios.post(`${API_URL}/intake-direct`, {
-        patientData: patientData
-      });
+      let response;
 
-      // Show success message with time taken
-      const timeTaken = getElapsedTime();
-      alert(`✅ Assessment completed successfully in ${timeTaken}!\n\nRedirecting to patient record...`);
+      if (isFollowUp && originalPatientId) {
+        // Update existing patient record
+        response = await axios.put(`${API_URL}/patients/${originalPatientId}`, {
+          patientData: patientData
+        });
 
-      navigate(`/patients/${response.data.patientId}`);
+        const timeTaken = getElapsedTime();
+        alert(`✅ Follow-up assessment completed in ${timeTaken}!\n\nPatient record updated successfully.`);
+        navigate(`/patients/${originalPatientId}`);
+      } else {
+        // Create new patient record
+        response = await axios.post(`${API_URL}/intake-direct`, {
+          patientData: patientData
+        });
+
+        const timeTaken = getElapsedTime();
+        alert(`✅ Assessment completed successfully in ${timeTaken}!\n\nRedirecting to patient record...`);
+        navigate(`/patients/${response.data.patientId}`);
+      }
 
     } catch (err) {
       console.error('Error processing assessment:', err);
@@ -334,8 +412,14 @@ function FormIntakeEnhanced() {
   return (
     <div className="form-intake-container">
       <div className="form-header">
-        <h2>Patient Assessment Form</h2>
-        <p className="subtitle">Systematic WHO IMCI clinical workflow</p>
+        <h2>
+          {isFollowUp ? '🔄 Follow-up Assessment' : 'Patient Assessment Form'}
+        </h2>
+        <p className="subtitle">
+          {isFollowUp
+            ? `Updating record for ${formData.name}`
+            : 'Systematic WHO IMCI clinical workflow'}
+        </p>
         <div className="form-actions">
           <button onClick={() => setShowTemplates(!showTemplates)} className="template-button">
             📋 Quick Templates

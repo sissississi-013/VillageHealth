@@ -9,6 +9,7 @@ function PatientDashboard() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [completedTasks, setCompletedTasks] = useState(new Set());
 
   useEffect(() => {
     fetchPatients();
@@ -54,6 +55,88 @@ function PatientDashboard() {
     }
   };
 
+  const generateTasks = () => {
+    const tasks = [];
+    patients.forEach((patient) => {
+      const patientName = patient.patientInfo?.name || patient.name;
+
+      // Urgent referral tasks
+      if (patient.urgentReferral) {
+        tasks.push({
+          id: `${patient.id}-urgent-referral`,
+          patientId: patient.id,
+          patientName,
+          task: `${patientName} needs URGENT referral to hospital`,
+          priority: 'critical',
+          type: 'referral'
+        });
+      }
+
+      // Regular referral tasks
+      if (patient.referralNeeded && !patient.urgentReferral) {
+        tasks.push({
+          id: `${patient.id}-referral`,
+          patientId: patient.id,
+          patientName,
+          task: `${patientName} needs referral to health facility`,
+          priority: 'high',
+          type: 'referral'
+        });
+      }
+
+      // Treatment tasks from diagnoses
+      if (patient.diagnoses && patient.diagnoses.length > 0) {
+        patient.diagnoses.forEach((diagnosis, index) => {
+          if (diagnosis.treatment) {
+            const treatmentSummary = diagnosis.treatment.split('.')[0]; // Get first sentence
+            tasks.push({
+              id: `${patient.id}-treatment-${index}`,
+              patientId: patient.id,
+              patientName,
+              task: `${patientName}: ${treatmentSummary}`,
+              priority: diagnosis.severity === 'critical' ? 'critical' : diagnosis.severity === 'moderate' ? 'high' : 'normal',
+              type: 'treatment'
+            });
+          }
+        });
+      }
+
+      // Follow-up tasks
+      if (patient.followUp && patient.followUp.length > 0) {
+        patient.followUp.forEach((followUp, index) => {
+          tasks.push({
+            id: `${patient.id}-followup-${index}`,
+            patientId: patient.id,
+            patientName,
+            task: `${patientName}: Follow-up ${followUp.condition} in ${followUp.timeline}`,
+            priority: 'normal',
+            type: 'followup'
+          });
+        });
+      }
+    });
+
+    // Sort by priority: critical > high > normal
+    return tasks.sort((a, b) => {
+      const priorityOrder = { critical: 0, high: 1, normal: 2 };
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    });
+  };
+
+  const toggleTask = (taskId) => {
+    setCompletedTasks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
+  };
+
+  const tasks = generateTasks();
+
   if (loading) {
     return (
       <div className="dashboard-container">
@@ -83,64 +166,103 @@ function PatientDashboard() {
         </Link>
       </div>
 
-      {patients.length === 0 ? (
-        <div className="empty-state">
-          <p>No patient records yet.</p>
-          <Link to="/" className="start-button">
-            Start First Assessment
-          </Link>
-        </div>
-      ) : (
-        <div className="patients-grid">
-          {patients.map((patient) => (
-            <Link
-              key={patient.id}
-              to={`/patients/${patient.id}`}
-              className="patient-card"
-            >
-              <div className="patient-card-header">
-                <div className="patient-info">
-                  <h3>{patient.patientInfo?.name || patient.name}</h3>
-                  <span className="patient-meta">
-                    {patient.patientInfo?.age || patient.age} • {patient.patientInfo?.sex || patient.sex}
-                  </span>
-                </div>
-                {patient.urgentReferral && (
-                  <span className="urgent-badge">URGENT</span>
-                )}
-                {patient.referralNeeded && !patient.urgentReferral && (
-                  <span className="referral-badge">REFERRAL</span>
-                )}
-              </div>
-
-              <div className="patient-card-body">
-                <div className="chief-complaint-section">
-                  <span className="label">Chief Complaint:</span>
-                  <p>{patient.chiefComplaint}</p>
-                </div>
-
-                {patient.diagnoses && patient.diagnoses.length > 0 && (
-                  <div className="diagnosis-preview">
-                    <div className={`diagnosis-badge ${getSeverityClass(patient.diagnoses[0].severity)}`}>
-                      {patient.diagnoses[0].classification}
-                    </div>
-                    {patient.diagnoses.length > 1 && (
-                      <span className="more-diagnoses">
-                        +{patient.diagnoses.length - 1} more
+      <div className="dashboard-content">
+        <div className="patients-section">
+          {patients.length === 0 ? (
+            <div className="empty-state">
+              <p>No patient records yet.</p>
+              <Link to="/" className="start-button">
+                Start First Assessment
+              </Link>
+            </div>
+          ) : (
+            <div className="patients-grid">
+              {patients.map((patient) => (
+                <Link
+                  key={patient.id}
+                  to={`/patients/${patient.id}`}
+                  className="patient-card"
+                >
+                  <div className="patient-card-header">
+                    <div className="patient-info">
+                      <h3>{patient.patientInfo?.name || patient.name}</h3>
+                      <span className="patient-meta">
+                        {patient.patientInfo?.age || patient.age} • {patient.patientInfo?.sex || patient.sex}
                       </span>
+                    </div>
+                    {patient.urgentReferral && (
+                      <span className="urgent-badge">URGENT</span>
+                    )}
+                    {patient.referralNeeded && !patient.urgentReferral && (
+                      <span className="referral-badge">REFERRAL</span>
                     )}
                   </div>
-                )}
-              </div>
 
-              <div className="patient-card-footer">
-                <span className="timestamp">{formatDate(patient.timestamp)}</span>
-                <span className="view-link">View Details →</span>
-              </div>
-            </Link>
-          ))}
+                  <div className="patient-card-body">
+                    <div className="chief-complaint-section">
+                      <span className="label">Chief Complaint:</span>
+                      <p>{patient.chiefComplaint}</p>
+                    </div>
+
+                    {patient.diagnoses && patient.diagnoses.length > 0 && (
+                      <div className="diagnosis-preview">
+                        <div className={`diagnosis-badge ${getSeverityClass(patient.diagnoses[0].severity)}`}>
+                          {patient.diagnoses[0].classification}
+                        </div>
+                        {patient.diagnoses.length > 1 && (
+                          <span className="more-diagnoses">
+                            +{patient.diagnoses.length - 1} more
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="patient-card-footer">
+                    <span className="timestamp">{formatDate(patient.timestamp)}</span>
+                    <span className="view-link">View Details →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        {tasks.length > 0 && (
+          <div className="task-sidebar">
+            <div className="task-sidebar-header">
+              <h3>🎯 Urgent Tasks</h3>
+              <span className="task-count">{tasks.filter(t => !completedTasks.has(t.id)).length} pending</span>
+            </div>
+            <div className="tasks-list">
+              {tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={`task-item ${task.priority} ${completedTasks.has(task.id) ? 'completed' : ''}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={completedTasks.has(task.id)}
+                    onChange={() => toggleTask(task.id)}
+                    className="task-checkbox"
+                  />
+                  <div className="task-content">
+                    <div className="task-text">{task.task}</div>
+                    <Link to={`/patients/${task.patientId}`} className="task-patient-link">
+                      View patient →
+                    </Link>
+                  </div>
+                  <div className={`task-priority-indicator ${task.priority}`}>
+                    {task.priority === 'critical' && '🚨'}
+                    {task.priority === 'high' && '⚠️'}
+                    {task.priority === 'normal' && '📋'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

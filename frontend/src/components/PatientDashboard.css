@@ -263,3 +263,156 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Dashboard Content Layout */
+.dashboard-content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.patients-section {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Task Sidebar */
+.task-sidebar {
+  width: 350px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 2rem;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+.task-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.task-sidebar-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.task-count {
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid;
+  background: #f8f9fa;
+  transition: all 0.2s;
+}
+
+.task-item.critical {
+  border-left-color: #dc3545;
+  background: #fff5f5;
+}
+
+.task-item.high {
+  border-left-color: #ffc107;
+  background: #fffbf0;
+}
+
+.task-item.normal {
+  border-left-color: #28a745;
+  background: #f0fff4;
+}
+
+.task-item.completed {
+  opacity: 0.6;
+  background: #f0f0f0;
+}
+
+.task-item.completed .task-text {
+  text-decoration: line-through;
+}
+
+.task-checkbox {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-text {
+  font-size: 0.9rem;
+  color: #333;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  word-wrap: break-word;
+}
+
+.task-patient-link {
+  font-size: 0.8rem;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.task-patient-link:hover {
+  text-decoration: underline;
+}
+
+.task-priority-indicator {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+  .dashboard-content {
+    flex-direction: column;
+  }
+
+  .task-sidebar {
+    width: 100%;
+    position: static;
+    max-height: none;
+  }
+
+  .patients-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .patients-grid {
+    grid-template-columns: 1fr;
+  }
+}

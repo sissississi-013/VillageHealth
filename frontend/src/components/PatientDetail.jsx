@@ -100,6 +100,12 @@ function PatientDetail() {
           ← Back to Records
         </Link>
         <div className="detail-actions">
+          <button
+            onClick={() => navigate('/', { state: { followUpPatient: patient } })}
+            className="followup-button"
+          >
+            🔄 Follow-up Diagnostic
+          </button>
           <button onClick={handleExport} className="export-button">
             📋 Export Referral
           </button>
